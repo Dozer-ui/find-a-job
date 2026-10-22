@@ -1,0 +1,49 @@
+Treating a local job search like a bug bounty target-scoping exercise is a brilliant paradigm shift. Instead of fighting opaque ATS algorithms and ghost listings on major job boards, you compile an explicit, verified inventory of the local economic landscape. Because every business—from manufacturing plants and logistics hubs to local medical practices and law firms—relies on IT infrastructure, your addressable market is vastly larger than what traditional tech job boards display.An end-to-end OSINT pipeline can be structured into four automated or semi-automated phases to generate your markdown checklist.Phase 1: Geographic Data Harvesting (The Footprint)To scrape a city and its surrounding areas for physical businesses, you want to query map data and open spatial registries to extract business names, physical addresses, and official web domains.OpenStreetMap Overpass API: For a clean, API-key-free approach, you can query OpenStreetMap using the Overpass API via Python (requests) or CLI tools (osmium). You define a bounding box for your target region and query for commercial nodes (amenity=, shop=, office=, industrial=). This returns raw JSON containing business names, street addresses, and website tags.Grid-Based Map Scraping: If you need deeper data from commercial maps, open-source CLI tools like Go-powered map scrapers (gosom/google-maps-scraper) allow you to slice a city into geographic grid cells to bypass result caps, extracting business names, addresses, and primary website URLs cleanly into a CSV.   Phase 2: Firmographic Enrichment (Sizing Up)To gauge company size without buying expensive corporate intelligence databases, you can leverage lightweight metadata proxies:Review Volume & Footprint Heuristics: The number of Google Maps reviews, physical footprint size (from property records or map data), or local directory listings often scale linearly with employee count.Domain Age & Tech Stack Check: A quick WHOIS lookup or running a tool like wafw00f or a lightweight DNS enumeration script can tell you if they host their own infrastructure or use enterprise cloud mail (Microsoft 365 vs. Google Workspace), which serves as a proxy for technical maturity and potential IT needs.Phase 3: Automated URL Path Enumeration (The Recon Touch)Once you have a list of raw domains (e.g., acmesupply.com), you need to find their specific /about and /careers endpoints. This is identical to directory fuzzing in web assessments, just scaled horizontally.You can write a lightweight Python script using requests or an asynchronous HTTP client like httpx to probe common path dictionaries:Pythonimport httpx
+from bs4 import BeautifulSoup
+
+# Common path dictionaries for fuzzing
+ABOUT_PATHS = ["/about", "/about-us", "/company", "/who-we-are", "/overview"]
+CAREERS_PATHS = ["/careers", "/jobs", "/opportunities", "/join-us", "/hiring", "/work-with-us"]
+
+def probe_domain(domain):
+    base_url = f"https://{domain}"
+    results = {"about": None, "careers": None}
+    
+    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) ResearchBot/1.0"}
+    
+    with httpx.Client(headers=headers, timeout=5.0, follow_redirects=True) as client:
+        # Check About paths
+        for path in ABOUT_PATHS:
+            try:
+                resp = client.get(base_url + path)
+                if resp.status_code == 200:
+                    results["about"] = resp.url
+                    break
+            except Exception:
+                continue
+                
+        # Check Careers paths
+        for path in CAREERS_PATHS:
+            try:
+                resp = client.get(base_url + path)
+                if resp.status_code == 200:
+                    results["careers"] = resp.url
+                    break
+            except Exception:
+                continue
+                
+    return results
+Phase 4: Markdown Checklist CompilationThe pipeline processes the aggregated JSON/CSV output, structures the data, and dumps it directly into a local Markdown file formatted for your Obsidian vault or local notes directory.The resulting checklist structure looks like this:Markdown## Local Business IT Target List - [City Name]
+
+- [ ] **Acme Manufacturing Co.**
+  - **Address:** 123 Industrial Pkwy, City, NY 14304
+  - **Est. Size:** ~50-100 employees (Medium facility)
+  - **Links:** [About Page](https://acmemfg.com/about-us) | [Careers Page](https://acmemfg.com/careers)
+  - **Notes:** Heavy machinery plant; likely manages local PLCs and on-prem hybrid IT. Cold outreach or walk-in drop-off target.
+
+- [ ] **Summit Logistics & Freight**
+  - **Address:** 456 Logistics Way, City, NY 14304
+  - **Est. Size:** ~20-30 employees
+  - **Links:** [About Page](https://summitlogistics.example/company) | [Careers Page](https://summitlogistics.example/join-us)
+  - **Notes:** Regional dispatch office. Need to check if they outsource helpdesk or need local sysadmin support.
+Would you prefer to build out the data ingestion layer using OpenStreetMap's Overpass API for code-driven spatial queries, or focus first on setting up a map-scraping tool to harvest raw business domains?

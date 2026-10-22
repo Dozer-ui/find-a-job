@@ -1,0 +1,73 @@
+Structuring this as a dedicated GitHub repository turns your OSINT pipeline into a fully functional, shareable open-source tool. Breaking each ZIP code into its own standalone Markdown document inside a zips/ directory keeps the project modular, lightweight, and easy to navigate whether viewed on GitHub or cloned into a local Obsidian vault.
+
+An ideal repository layout, along with the core structural templates to bring it together, can be organized as follows.
+Repository Directory Structure
+Plaintext
+
+buffalo-it-recon/
+├── README.md
+├── assets/
+│   └── erie-county-zip-map.png
+├── scripts/
+│   ├── harvest.py
+│   └── recon_urls.py
+└── zips/
+    ├── 14201.md
+    ├── 14202.md
+    ├── 14226.md
+    └── ...
+
+1. The README.md Template
+
+The landing page serves as the user manual, visual anchor, and navigation hub.
+Markdown
+
+# Buffalo & WNY Local IT Job Reconnaissance Pipeline
+
+A privacy-focused, OSINT-driven alternative to mainstream job boards. This repository maps physically verified businesses across the greater Buffalo area, categorized by postal code, to help local IT job seekers conduct systematic, targeted outreach.
+
+## Regional ZIP Code Reference
+
+![Erie County ZIP Map](assets/erie-county-zip-map.png)
+
+*Use the map above to identify your target commuter zone, then select the corresponding postal directory below.*
+
+## Quick Links / Target Zones
+
+### Urban Core & Downtown
+- [`14202` - Downtown / Financial District](zips/14202.md)
+- [`14203` - Downtown Commercial](zips/14203.md)
+- [`14209` - Elmwood / Allentown](zips/14209.md)
+
+### North Suburbs
+- [`14226` - Amherst / Snyder](zips/14226.md)
+- [`14228` - Amherst / Getzville (UB North corridor)](zips/14228.md)
+- [`14150` - Tonawanda](zips/14150.md)
+
+### South & East Suburbs
+- [`14225` - Cheektowaga](zips/14225.md)
+- [`14224` - West Seneca](zips/14224.md)
+
+---
+*Generated via automated OpenStreetMap Overpass queries and asynchronous HTTP path enumeration.*
+
+2. Individual ZIP Code Checklist Template (zips/14226.md)
+
+Each regional file contains the structured checklist populated by your Python pipeline.
+Markdown
+
+# ZIP Code: 14226 (Amherst / Snyder)
+
+- [ ] **Acme Systems Corp.**
+  - **Address:** 1200 Wehrle Dr, Amherst, NY 14226
+  - **Est. Size:** ~45 employees
+  - **Links:** [About Page](https://acmesystems.example/about) | [Careers Page](https://acmesystems.example/careers)
+  - **Notes:** Managed service provider branch office. Walk-in or direct HR email target.
+  - **Status:** Uncontacted
+
+- [ ] **Northtown Medical Associates**
+  - **Address:** 2400 Eggert Rd, Amherst, NY 14226
+  - **Est. Size:** ~20 employees
+  - **Links:** [About Page](https://northtownmed.example/company/about-us) | [Careers Page](https://northtownmed.example/careers)
+  - **Notes:** Local clinic network; likely handles internal EHR support and local hardware maintenance.
+  - **Status:** Uncontacted

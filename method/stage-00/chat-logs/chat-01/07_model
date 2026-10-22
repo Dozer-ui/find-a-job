@@ -1,0 +1,65 @@
+That approach is far more practical. Delegating spatial categorization to official postal codes entirely eliminates the need for manual geometric bounding boxes. By casting a single wide net over the entire Western New York region and letting your post-processing script bucket entries by their addr:postcode tag, the data organizes itself cleanly.
+1. The Single Regional Overpass Query
+
+Instead of slicing up the map manually, you define one large bounding box encompassing Buffalo and its immediate ring suburbs (Amherst, Cheektowaga, Tonawanda, West Seneca, Lackawanna, etc.).
+Plaintext
+
+[out:json][timeout:60];
+[bbox:42.75,-79.05,43.05,-78.65];
+
+(
+  nwr["office"][name];
+  nwr["shop"][name];
+  nwr["industrial"][name];
+  nwr["craft"][name];
+  nwr["amenity"~"bank|clinic|doctors|dentist"][name];
+);
+
+out center tags;
+
+Using out center tags; ensures that whether an entity is recorded in OpenStreetMap as a single node or a sprawling polygonal building way, Overpass calculates its geographic center point and attaches all metadata tags (including address data) to the output.
+2. Python Post-Processing & ZIP Code Grouping
+
+Once the JSON payload is saved locally, a straightforward Python script parses the elements, extracts the postal code, and builds a dictionary keyed by ZIP code.
+Python
+
+import json
+from collections import defaultdict
+
+def group_businesses_by_zip(json_filepath):
+    with open(json_filepath, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        
+    zip_groups = defaultdict(list)
+    
+    for element in data.get("elements", []):
+        tags = element.get("tags", {})
+        name = tags.get("name")
+        
+        if not name:
+            continue
+            
+        # Extract address components
+        postcode = tags.get("addr:postcode", "Unknown ZIP")
+        street = tags.get("addr:street", "")
+        housenumber = tags.get("addr:housenumber", "")
+        city = tags.get("addr:city", "Buffalo")
+        
+        address = f"{housenumber} {street}, {city}, NY {postcode}".strip()
+        website = tags.get("website") or tags.get("contact:website")
+        
+        business_entry = {
+            "name": name,
+            "address": address if address != ", NY Unknown ZIP" else "Address unlisted",
+            "website": website
+        }
+        
+        zip_groups[postcode].append(business_entry)
+        
+    return zip_groups
+
+3. Integrating Visual Reference Maps
+
+To make the markdown output immediately actionable for a job seeker without requiring them to memorize postal codes, you can anchor the document with a lightweight geographic reference at the top.
+
+You can embed a standard visual reference link—such as a direct link to the official USPS ZIP code map tool for Erie County or a static layout image—right at the introduction of your markdown file. For instance, linking to a regional reference like the Erie County ZIP Code Map overview allows a user to glance at the map, see that 14226 covers Amherst or 14202 covers Downtown Buffalo, and instantly jump to that exact heading in your markdown checklist to begin their targeted research.

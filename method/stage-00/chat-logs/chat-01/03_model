@@ -1,0 +1,30 @@
+Choosing between the OpenStreetMap Overpass API and grid-based map scraping comes down to a trade-off between programmatic cleanliness and data density. Given your preference for reproducibility, reliability, and performance, here is how the two approaches stack up against your criteria.
+Option 1: OpenStreetMap Overpass API
+
+The Overpass API allows you to query the global OpenStreetMap database directly using a dedicated query language (Overpass QL) via HTTP POST requests, returning structured JSON.
+
+    Reproducibility: Exceptional. Because it is an official, versioned programmatic API with a deterministic database, running the exact same query script today, next week, or next year yields identical, clean JSON structures. There are no DOM selectors to break or UI layouts to change.
+
+    Reliability: High, with caveats. There are no CAPTCHAs, dynamic JavaScript rendering issues, or sudden IP bans. However, reliability depends entirely on community-contributed data. In densely populated urban areas, business listings and website tags are robust. In smaller towns or rural fringes, local mapping can be sparse, meaning some businesses might lack a tagged website or physical footprint.
+
+    Performance: Blazing fast. A single HTTP request with a bounding box and a filter (e.g., shop=* or amenity=*) returns thousands of structured nodes in a fraction of a second. You can process an entire city's data locally in memory instantly using Python's built-in json module.
+
+Option 2: Grid-Based Map Scraping (e.g., Google Maps)
+
+This technique involves breaking a geographic area down into a grid of coordinate pairs and utilizing browser automation (Playwright/Selenium) or unofficial API wrappers to scrape commercial directory results.
+
+    Reproducibility: Low to Moderate. Proprietary map interfaces change constantly. A DOM update by the platform provider can break your scraper overnight. Furthermore, varying anti-bot measures mean execution can be flaky across runs.
+
+    Reliability: Fragile. These scrapers frequently run into rate limits, IP blocks, and CAPTCHAs, requiring proxy rotation pools and random sleep timers to run smoothly.
+
+    Performance: Slow. Because browser automation or deep API simulation is required to render and paginate through local results grid-by-grid, harvesting a full city takes minutes or hours rather than milliseconds.
+
+    The Big Advantage (Data Density): Despite the engineering overhead, proprietary map scrapers capture virtually every registered business with a web presence, including small professional offices and niche shops that may not be mapped on OpenStreetMap.
+
+Recommendation
+
+If you prioritize a clean, lightning-fast developer experience with zero maintenance overhead, start with the OpenStreetMap Overpass API. You can write a concise Python script using requests that pulls all commercial nodes into a structured format instantly, allowing you straightaway to test your URL path enumeration and markdown generation logic.
+
+If you run your Overpass query and find that the local business density or website tag coverage is missing critical segments of your target area, you can then pivot to a grid-based scraper as a secondary ingestion layer.
+
+Would you like to write out a quick Python script to test an Overpass API query for a target bounding box?
