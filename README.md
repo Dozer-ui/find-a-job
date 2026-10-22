@@ -20,12 +20,11 @@
 
 - Open Street Map - utilizing Overpass API
 - State business registries
-- yellowpages.com
 - County GIS and assessor records
 
 # FINAL RESULTS
 
-The final result of this recon and data transformation methodology should result in a series of documents organized by U.S. Postal zip codes. Each document will contain a list of entries that comprise the businesses identified in that boundary. Each entry will include (if available) the following data points:
+The final result of this recon and data transformation methodology should result in a series of documents organized by U.S. Postal zip codes. Each document will contain a list of entries comprised of the businesses identified in that boundary. Each entry will include (if available) the following data points:
 - Business name
 - Address
 - estimated size (number of employees)
