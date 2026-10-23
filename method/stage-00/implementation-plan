@@ -1,0 +1,4 @@
+1. Gather data with Overpass API
+  - build node to run query
+  - write raw results to host
+  - destroy node
