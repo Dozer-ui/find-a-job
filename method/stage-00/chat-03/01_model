@@ -1,0 +1,71 @@
+Line-by-Line Breakdown of the Overpass Query
+
+    [out:json][timeout:60];: Instructs the Overpass API to return the results in JSON format and sets a server-side execution timeout limit of 60 seconds.
+
+    [bbox:42.75,-79.05,43.05,-78.65];: Defines the geographic bounding box using coordinates in the order (South, West, North, East) covering the wider Buffalo, NY area.
+
+    ( and ): Opens and closes a union block, combining the results of all individual filter statements inside.
+
+    nwr["office"][name];: Searches for nodes (n), ways (w), and relations (r) tagged with office that also have a name tag.
+
+    nwr["shop"][name];: Searches for nodes, ways, and relations tagged with shop that have a name.
+
+    nwr["industrial"][name];: Searches for industrial areas or features with a name.
+
+    nwr["craft"][name];: Searches for craft businesses (e.g., workshops, trades) with a name.
+
+    nwr["amenity"~"bank|clinic|doctors|dentist"][name];: Uses a regular expression to search for specific amenities (banks, clinics, doctors, or dentists) that possess a name.
+
+    ;: Terminates individual query statements.
+
+    out center tags;: Outputs the results, calculating a geographic center point for ways and relations (such as buildings or land polygons) and including all of their OpenStreetMap tags.
+
+Expected Output Structure
+
+The output will be formatted as a single JSON file containing a root object with metadata (such as the API version and generation timestamp) and an array called elements. Each item in the array represents a matched business or location with its ID, type, geographic coordinates (latitude and longitude or center coordinates), and a dictionary of its OSM tags.
+
+Depending on the urban density of the Buffalo bounding box, the resulting file will typically range from several megabytes to tens of megabytes, containing thousands of individual JSON objects.
+Setting Up and Running in an Incus System Container
+
+Because you are running a Fedora Atomic host with Incus, you can spin up a clean, isolated system container to handle the query execution without modifying your immutable host environment.
+
+1. Launch and enter an Alpine-based container:
+Bash
+
+incus launch images:alpine/3.21/cloud overpass-runner
+incus exec overpass-runner -- sh
+
+2. Install curl inside the container:
+Bash
+
+apk add curl
+
+3. Create the query file:
+Write your query to a file named query.overpass:
+Bash
+
+cat << 'EOF' > query.overpass
+[out:json][timeout:60];
+[bbox:42.75,-79.05,43.05,-78.65];
+(
+  nwr["office"][name];
+  nwr["shop"][name];
+  nwr["industrial"][name];
+  nwr["craft"][name];
+  nwr["amenity"~"bank|clinic|doctors|dentist"][name];
+);
+out center tags;
+EOF
+
+4. Execute the query against the Overpass API:
+Bash
+
+curl -X POST --data @query.overpass https://overpass-api.de/api/interpreter -o buffalo_businesses.json
+
+5. Transfer the file back to your host:
+Once the query completes, you can pull the resulting JSON file directly from the container to your Fedora host machine:
+Bash
+
+incus file pull overpass-runner/root/buffalo_businesses.json ./buffalo_businesses.json
+
+Would you like assistance writing a script to parse or filter this JSON output using jq?

@@ -2,3 +2,11 @@
   - build node to run query
   - write raw results to host
   - destroy node
+
+2. During implementation/planning of step 1, a more suitable method was discovered.
+  - spawn node
+  - install curl and osmium
+  - bypass API and database engine altogether and aquire full region dataset as a file
+  - utilize osmium to extract specific region
+  - utilize osmium to extract datapoints
+  - parse extracted data into desired format (JSON)

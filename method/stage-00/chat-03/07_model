@@ -1,0 +1,25 @@
+Alpine 3.21 was chosen initially because it is ultra-minimal, boots instantly, and has a minuscule footprint—making it ideal for an isolated environment whose sole job was firing a single curl command at an HTTP endpoint.
+
+However, that image choice should change now that the architecture has shifted to local geospatial processing. Alpine does not package osmium-tool in its standard stable repositories, meaning you would have to manually compile its complex C++ dependencies (like libosmium and protozero) from source using CMake.   
+GitHub
+
+Switching your container base image to Debian 12 eliminates this friction. osmium-tool is available directly in Debian’s native software repositories, allowing you to install a precompiled, production-ready binary with a single command.
+Setting Up a Debian Incus Container with Osmium
+
+1. Launch and enter a Debian 12 system container:
+Bash
+
+incus launch images:debian/12 osmium-processor
+incus exec osmium-processor -- bash
+
+2. Update package lists and install osmium-tool and curl:
+Bash
+
+apt update && apt install -y osmium-tool curl
+
+3. Verify the installation:
+Bash
+
+osmium --version
+
+With the environment provisioned, you can now download the New York regional .osm.pbf extract and begin executing your local extraction pipeline right inside the container.

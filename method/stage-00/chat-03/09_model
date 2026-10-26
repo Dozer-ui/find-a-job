@@ -1,0 +1,37 @@
+Available Post-Extraction File Formats
+
+When converting raw OSM data into something actionable, you have a few standard formats to choose from, each suited for different tasks:
+
+    GeoJSON: A geospatial extension of JSON that wraps features in a FeatureCollection. Every object carries its geometry (points, polygons) and properties in a single, standardized structure. It is natively supported by web mapping libraries (like Leaflet or Mapbox) and desktop GIS software (like QGIS), though it can become verbose and memory-heavy for large datasets.
+
+    GeoPackage (.gpkg): A lightweight, SQLite-based database container designed for geographic data. It allows you to run SQL queries, build spatial indexes, and store vector data efficiently in a single file. It is ideal if you plan to query the data relationally later without keeping everything in memory.
+
+    CSV (Comma-Separated Values): A classic tabular format. Great for flat rows of data, though handling nested geographic polygons (like the boundary of a large industrial park) requires encoding geometry as Well-Known Text (WKT) strings.
+
+    JSON Lines (JSONL): A format where every line of the file is a valid, independent JSON object. It combines the structured flexibility of JSON with the stream-processing convenience of flat files.
+
+Evaluating Your Line-Correlated Flat File Approach
+
+Your proposed approach—splitting data attributes into parallel, line-correlated files where line 1 of businesses.txt matches line 1 of gps_coordinates.txt—is a classic flat-file database design pattern. It mirrors how columnar databases and legacy Unix systems optimized storage before modern relational databases or JSON formats took over.
+
+While it demonstrates strong systems-thinking and a desire for clean tabular organization, it carries a major operational risk: index drift and fragility.
+
+If a single script iteration, sorting anomaly, filtering bug, or blank entry causes one file to drop a line or misalign by a single index, the entire relational integrity of your dataset breaks silently. Recovering from that mismatch without unique identifiers (like OSM IDs) becomes extremely difficult.
+
+A safer evolution of your idea is JSON Lines (JSONL) or a single CSV file with proper headers. In JSONL, each line represents a single, self-contained business record containing its name, coordinates, category, and tags all in one object:
+JSON
+
+{"id": 123456, "name": "Example Corp", "type": "office", "lat": 42.88, "lon": -78.87}
+
+This preserves the exact line-by-line stream-processing benefits you want (allowing you to read the file line-by-line in code using standard while read loops or Python iterators) while eliminating the risk of file-to-file synchronization errors.
+Assessing Your Understanding
+
+Your grasp of the data pipeline architecture is remarkably solid. You have successfully mapped out the entire lifecycle:
+
+    Sourcing raw regional data offline for reproducibility.
+
+    Slicing and filtering the dataset locally to eliminate upstream dependencies.
+
+    Transforming complex graph structures into structured local records.
+
+You are approaching this with the exact rigor needed for reliable data engineering. Would you like to draft a quick Python snippet using Osmium bindings or standard text processing to parse your clipped .osm.pbf file into a clean JSONL format?

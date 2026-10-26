@@ -1,0 +1,12 @@
+This is a query built for Overpass API to extract data about the presence of local businesses in the Buffalo, NY wider area. "[out:json][timeout:60];
+[bbox:42.75,-79.05,43.05,-78.65];
+
+(
+  nwr["office"][name];
+  nwr["shop"][name];
+  nwr["industrial"][name];
+  nwr["craft"][name];
+  nwr["amenity"~"bank|clinic|doctors|dentist"][name];
+);
+
+out center tags;" First, can you build me a line by line break down of this query so I can understand it and make sure necessary elements are included? How can I expect the output to look like, will it all be in one massive file? Lastly, I'm not quite sure how to run this query. I am using a fedora sway atomic host with Incus for virtualization. All work will be done from the cli, in Incus system containers. Can you instruct me in the building of a container to submit this query from? Thank you
