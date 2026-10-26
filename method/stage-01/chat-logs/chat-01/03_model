@@ -1,0 +1,8 @@
+The error happens because the negative sign (-) in -79.05 directly following -b confuses the command-line parser. Without an equals sign, the parser misinterprets the space or treats the negative number as a separate flag, throwing off the positional arguments.
+
+To fix this, use an equals sign (=) to explicitly bind the bounding box coordinates to the -b (or --bbox) option:
+Bash
+
+osmium extract -b=-79.05,42.75,-78.65,43.05 new-york-261025.osm.pbf -o buffalo_clip.osm.pbf
+
+(Note: Your command used -o buffalo_clip.osm, which outputs plain XML. Changing the output extension to .osm.pbf will keep it as a compressed PBF file, which is much smaller and faster).

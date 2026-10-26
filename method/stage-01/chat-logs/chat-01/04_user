@@ -1,0 +1,1 @@
+I am attempting to extract certain tags and then parse them into an eventual final JSON format. Is the expected XML output format suitable for that endeavor? So, once I get my specific region sliced out of the full dataset I will use osmium again to extract the desired tags. so, better to have this stage output as XML or .osm.pbf?

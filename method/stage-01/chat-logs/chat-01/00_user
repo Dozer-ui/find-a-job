@@ -1,0 +1,1 @@
+I have a .osm.pbf file from OpenStreetMap. I used "osmium extract -b -79.05,42.75,-78.65,43.05 new-york-latest.osm.pbf -o buffalo_clip.osm.pbf" to extract a specific slice of the dataset outlined by the bounding box coordinates. However, (Debian 12 shell) returned this error when I tried to run: PBF error: invalid BlobHeader size (> max_blob_header_size)

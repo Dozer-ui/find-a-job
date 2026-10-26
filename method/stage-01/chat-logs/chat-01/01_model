@@ -1,0 +1,30 @@
+This error comes from libosmium (the underlying library for osmium) and means that the input file (new-york-latest.osm.pbf) is either corrupted, incomplete, or not actually a valid OSM PBF file (such as an HTML error page saved with a .pbf extension).
+How to diagnose and fix the issue
+
+    Check the actual file contents (to rule out an HTML error page):
+    Run the following command to see what the file actually contains:
+    Bash
+
+    head -n 5 new-york-latest.osm.pbf
+
+    If the output starts with <!DOCTYPE html> or <html>, your download failed and saved an HTTP error page (like a 404 Not Found or a server block) instead of the dataset.
+
+    Check the file type using file:
+    Bash
+
+    file new-york-latest.osm.pbf
+
+    A valid PBF file will typically be identified as binary data or specific protocol buffer streams, not text/HTML.
+
+    Test the file with osmium fileinfo:
+    Bash
+
+    osmium fileinfo new-york-latest.osm.pbf
+
+    If fileinfo fails with the same BlobHeader size error, the file is structurally damaged.
+
+    Re-download the file:
+    If the file was interrupted or corrupted during download, delete it and download it again. If you downloaded it from Geofabrik, make sure to check its corresponding .md5 file to verify integrity:
+    Bash
+
+    md5sum -c new-york-latest.osm.pbf.md5

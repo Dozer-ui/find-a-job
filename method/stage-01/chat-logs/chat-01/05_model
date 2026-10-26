@@ -1,0 +1,20 @@
+Stick with .osm.pbf.
+
+Using PBF for intermediate steps offers several distinct advantages:
+
+    File Size and Speed: PBF files are compressed binary streams. A regional XML extract can balloon to gigabytes very quickly, whereas the PBF equivalent is a fraction of the size and vastly faster to read and parse.
+
+    Lossless Storage: PBF retains 100% of the OSM data attributes (nodes, ways, relations, and all tags) with no precision loss.
+
+    Tool Compatibility: Almost all modern OSM tools (including osmium itself, osmium-tool, and language bindings in Python, C++, etc.) read PBF natively and much faster than XML.
+
+Streamlining Your Next Step
+
+If your ultimate goal is to get filtered tags into a JSON format, you can often bypass writing a custom parsing script entirely by using osmium export.
+
+Instead of doing a separate tag-extraction step followed by manual JSON conversion, osmium export can read your .osm.pbf file, filter specific tags via a configuration file, and output GeoJSON directly in a single command:
+Bash
+
+osmium export buffalo_clip.osm.pbf -o buffalo_features.geojson
+
+What specific tags or features are you planning to extract for your final JSON output?
