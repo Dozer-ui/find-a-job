@@ -16,7 +16,7 @@
 4. Generate succinct business summaries/overviews
 5. Populate final documents
 
-# DATA SOURCES
+# POTENTIAL DATA SOURCES
 
 - Open Street Map - utilizing Overpass API
 - State business registries
