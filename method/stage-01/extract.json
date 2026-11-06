@@ -1,0 +1,8 @@
+{
+  "extracts": [
+    {
+      "output": "buffalo_clip.osm.pbf",
+      "bbox": [-79.05, 42.75, -78.65, 43.05]
+    }
+  ]
+}

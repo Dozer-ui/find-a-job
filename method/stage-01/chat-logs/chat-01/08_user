@@ -1,0 +1,1 @@
+Thanks for the breakdown. So I ran `osmium extract -b=-79.05,42.75,-78.65,43.05 new-york-261025.osm.pbf -o buffalo_clip.osm.pbf` and got this error: "wrong format for coordinate: '=-79.05'"

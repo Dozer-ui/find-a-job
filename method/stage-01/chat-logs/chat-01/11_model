@@ -1,0 +1,39 @@
+The JSON error at offset 0: Invalid value indicates that extract.json is either empty, contains a hidden encoding artifact (like a Byte Order Mark), or was saved with invalid syntax.
+
+You can resolve this instantly using either of the two methods below.
+Option 1: Bypass the Config File via Command Line (Recommended)
+
+Using a space after --bbox (instead of an equals sign) prevents the shell and parser from confusing the negative coordinate with a flag:
+Bash
+
+osmium extract --bbox -79.05,42.75,-78.65,43.05 new-york-261025.osm.pbf -o buffalo_clip.osm.pbf
+
+Option 2: Recreate a Clean Config File
+
+If you prefer using the configuration file method, overwrite extract.json with a clean, uncorrupted file by running this heredoc command in your shell:
+Bash
+
+cat << 'EOF' > extract.json
+{
+  "extracts": [
+    {
+      "output": "buffalo_clip.osm.pbf",
+      "bbox": [-79.05, 42.75, -78.65, 43.05]
+    }
+  ]
+}
+EOF
+
+Then rerun the extraction:
+Bash
+
+osmium extract --config extract.json new-york-261025.osm.pbf
+
+Verification
+
+Confirm the extraction completed successfully and that buffalo_clip.osm.pbf is valid by checking its file metadata:
+Bash
+
+osmium fileinfo buffalo_clip.osm.pbf
+
+    Success criteria: The command prints the file info, showing the correct bounding box parameters and a valid PBF header structure without throwing parsing errors.

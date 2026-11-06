@@ -1,0 +1,8 @@
+
+Glad to hear that got it sorted out!Now that you have your buffalo_clip.osm.pbf file cleanly sliced, the next step is to run the tag filter to isolate all the business and office data we discussed for your lead list, and then export it into a workable format.Step 1: Filter the TagsRun the following command to filter out everything except offices, shops, trades, and key service/commercial amenities:Bashosmium tags-filter buffalo_clip.osm.pbf \
+  nwr/office \
+  nwr/craft \
+  nwr/shop \
+  nwr/amenity=bank,clinic,doctors,dentist,pharmacy,veterinary,hospital,restaurant,hotel \
+  -o buffalo_businesses.osm.pbf
+(The nwr/ prefix tells osmium to look across Nodes, Ways, and Relations).Step 2: Export Directly to GeoJSON/JSONOnce filtered, you can convert that smaller PBF file directly into GeoJSON (which is natively JSON and can easily be loaded into Python scripts, databases, or spreadsheet tools):Bashosmium export buffalo_businesses.osm.pbf -o buffalo_businesses.geojson

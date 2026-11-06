@@ -1,0 +1,1 @@
+Thank you. The error was that I included "JSON" as the first line in the extract.json file by mistake. Ran smoothly once I removed that line.

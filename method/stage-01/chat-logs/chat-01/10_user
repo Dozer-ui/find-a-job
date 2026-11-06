@@ -1,0 +1,1 @@
+Okay, please see if you can identify the problem now. Here is my input and output: "root@osmium-processor:~# osmium extract --config extract.json new-york-261025.osm.pbf   Error while reading config file 'extract.json':JSON error at offset 0: Invalid value."

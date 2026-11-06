@@ -1,0 +1,28 @@
+That error occurs because osmium's command-line parser has a known quirk where using the = sign with -b= leaves the = attached to the first coordinate string, causing its internal parser to choke on =-79.05.
+
+The most robust and cleanest way to bypass command-line negative-number parsing bugs in osmium is to use a brief JSON configuration file.
+Solution: Use a Configuration File
+
+    Create a configuration file named extract.json in your working directory using your text editor:
+    JSON
+
+    {
+      "extracts": [
+        {
+          "output": "buffalo_clip.osm.pbf",
+          "bbox": [-79.05, 42.75, -78.65, 43.05]
+        }
+      ]
+    }
+
+    Run the extraction command using the config flag:
+    Bash
+
+    osmium extract --config extract.json new-york-261025.osm.pbf
+
+    Verification: Confirm the extraction completed successfully and check the file details by running:
+    Bash
+
+    osmium fileinfo buffalo_clip.osm.pbf
+
+    This should output file metadata confirming the bounding box region and valid PBF structure without parsing errors.
