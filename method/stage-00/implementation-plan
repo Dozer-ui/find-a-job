@@ -5,7 +5,7 @@
 
 2. During implementation/planning of step 1, a more suitable method was discovered.
   - spawn node
-  - install curl and osmium
+  - install curl, osmium and python3
   - bypass API and database engine altogether and aquire full region dataset as a file
   - utilize osmium to extract specific region
   - utilize osmium to extract datapoints

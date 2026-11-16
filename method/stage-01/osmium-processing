@@ -1,0 +1,88 @@
+# This file documents how to build out a node for stage-01 data processing with Osmium and Python, as well as the Osmium processing execution.
+# I used Incus to launch a Linux system container using the Debian 12 image.
+# This container functions just like a Debian 12 virtual machine.
+# Key differences are that the hardware layer is not virtualized and the container shares my host kernel.
+# Incus utilizes kernel namespaces to create an isolated file system sharing my host kernel.
+# Essentially, the Debian 12 instance can make system calls that interact directly with actual hardware.
+# If you wish, you can use a full virtual machine with the same results, it would just cost more compute at the virtualization layer and is unneccesary for this use case.
+# I use a system container in this instance because the goal is just to have an isolated working environment, while preserving performance.
+
+# With the Incus image launched I can enter a shell session as the default root user.
+# Once inside the virtual Debian 12 instance:
+
+# Install tools:
+apt update && apt install -y osmium-tool curl python3
+
+# You can verify installations: (if your terminal returns "command not found" then the tool didn't install properly)
+osmium --version
+python3 -version
+curl --version
+
+# Use `curl` to download target file. `curl` isn't necessary, the files can be obtained from the webpage manually and pushed to the node.
+# However, for automation later, I will be working from the cli.
+# The data in these files changes regularly so by the time you use `curl` to get a file, it will be outdated and the server will return "404 Not Found"
+# So, to use `curl` effectively in this scenario I first requested this URL:
+curl -O https://download.geofabrik.de/north-america/us/new-york-latest.osm.pbf
+
+# This will write a file to the current working directory named new-york-latest.osm.pbf.
+# The request returns "307 Temporary Redirect" which will include the location of the latest dataset.
+# You can use `cat` to view the file, which captured the http response.
+# At the time I was writing this doc it looks like this:
+(run the first curl command shown above)
+
+# Display the downloaded file's contents:
+cat new-york-latest.osm.pbf
+
+# It will show you the server's http response, telling you where the requested document is now located:
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>307 Temporary Redirect</title>
+</head><body>
+<h1>Temporary Redirect</h1>
+<p>The document has moved <a href="https://download.geofabrik.de/north-america/us/new-york-261115.osm.pbf">here</a>.</p>
+</body></html>
+
+# Now, re-run the curl request with the URL given:
+curl -O https://download.geofabrik.de/north-america/us/new-york-261115.osm.pbf
+
+# You will note that this takes much longer than the original request, a good sign that something is actually being downloaded.
+# Check the file contents with `head`. If that doesn't show an http response, the file probably downloaded:
+head new-york-261115.osm.pbf
+
+# You can also use Osmium to verify the download, noting the file size is a good verifier that this file actually includes the dataset.
+# Use `grep` to filter out just the "Size" line: (If it is pretty big, the file is probably full of data)
+osmium fileinfo new-york-261115.osm.pbf | grep Size
+
+# Now that a dataset is obtained, for developing on a local machine I only want to work with a small region of data.
+# Osmium enables extraction of data based on a geospatial area, or in other words, you can define an outline of the target region as if you drew an outline on a map.
+# If you want more in depth information please refer to Osmium's documentation.
+# To put it simply, provide 4 coordinates that define the perimeter of the target area and Osmium will extract all of the data in that area to a smaller osm.pbf file.
+# The best way I found to do this is to define the target area in a JSON file then inject that file into the Osmium command.
+# The file for the Buffalo and surrounding region is named "extract.json" and looks like this:
+{
+  "extracts": [
+    {
+      "output": "buffalo_clip.osm.pbf",
+      "bbox": [-79.05, 42.75, -78.65, 43.05]
+    }
+  ]
+}
+
+# You can see that 4 coordinates are defined as well as the name the extracted file will be given.
+# Extract the target region with Osmium like this:
+osmium extract --config extract.json new-york-261115.osm.pbf
+
+# Now you have a dataset of your targeted region!
+# Now that the target region is obtained Osmium can be used to extract just the business information needed.
+# Again, refer to Osmium and OpenStreetMap documentation for more information.
+# Simply put, information is tagged and attached to geospatial locations.
+# So, you need to extract just the tags you want to use. In this case these tags are used:
+# nwr/office
+# nwr/craft
+# nwr/shop
+# nwr/amenity=bank,clinic,doctors,dentist,pharmacy,veterinary,hospital,restaurant,hotel
+# Use Osmium to filter the dataset based on these tags:
+osmium tags-filter buffalo_clip.osm.pbf nwr/office nwr/craft nwr/shop nwr/amenity=bank,clinic,doctors,dentist,pharmacy,veterinary,hospital,restaurant,hotel -o buffalo_businesses.osm.pbf
+
+# This created a filtered dataset "buffalo_clip.osm.pbf" containing only the information that will be useful to this project.
+# buffalo_clip.osm.pbf will be further cleaned and formatted using Python, which will be detailed in a separate document.
